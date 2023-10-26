@@ -1,0 +1,117 @@
+823. Binary Trees With Factors
+Given an array of unique integers, arr, where each integer arr[i] is strictly greater than 1.
+We make a binary tree using these integers, and each number may be used for any number of times. Each non-leaf node's value should be equal to the product of the values of its children.
+Return the number of binary trees we can make. The answer may be too large so return the answer modulo 10^9 + 7.
+
+Example 1:
+Input: arr = [2,4]
+Output: 3
+Explanation: We can make these trees: [2], [4], [4, 2, 2]
+
+Example 2:
+Input: arr = [2,4,5,10]
+Output: 7
+Explanation: We can make these trees: [2], [4], [5], [10], [4, 2, 2], [10, 2, 5], [10, 5, 2].
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Program : 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+USING UNORDERED MAP :
+
+class Solution {
+public:
+    int numFactoredBinaryTrees(vector<int>& arr) 
+    {
+        unordered_map<int, long long int> dp;
+        sort(arr.begin(), arr.end());
+
+        for (int i = 0; i < arr.size(); i++) 
+        {
+            dp[arr[i]] = 1;
+        }
+
+        for (int i = 0; i < arr.size(); i++) 
+        {
+            for (int j = 0; j < i; j++) 
+            {
+                if (arr[i] % arr[j] == 0) 
+                {
+                    int factor = arr[i] / arr[j];
+                    if (dp.find(factor) != dp.end()) 
+                    {
+                        dp[arr[i]] += (dp[arr[j]] * dp[factor]);
+                    }
+                }
+            }
+        }
+
+        long long int sum = 0;
+        for (auto& x : dp) 
+        {
+            sum += x.second;
+        }
+
+        return sum % 1000000007;
+    }
+};
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+USING MAP :
+
+class Solution {
+public:
+    int numFactoredBinaryTrees(vector<int>& arr) 
+    {
+        map <int, long long int> dp;
+        sort(arr.begin(),arr.end());
+
+        for(int i = 0; i < arr.size(); i++)
+        {
+            dp.insert({arr[i],1});
+        }
+
+        for(int i = 1; i < arr.size(); i++)
+        {
+            auto it1 = dp.find(arr[i]);
+            long long int count = 0;
+            for(int j = 0; j < i; j++)
+            {
+                if((arr[i] % arr[j]) == 0)
+                {
+                    auto it2 = dp.find(arr[i]/arr[j]);
+                    auto it3 = dp.find(arr[j]);
+
+                    if(it2 != dp.end())
+                    {
+                        count += ((it2->second)*(it3->second));
+                    }
+                }
+            }
+
+            it1->second += count;
+        }
+
+        long long int sum = 0;
+        for(auto x = dp.begin(); x != dp.end(); x++)
+        {
+            sum += x->second;
+        }
+
+        return (sum % 1000000007);
+    }
+};
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--> j shud place at 0 and i shud be placed at 1
+--> fill the map with 1.
+--> if arr[i] factor is arr[j], then other multiplicand will be arr[i]/arr[j]
+    Ex : 10 factor is 5, then other will be 10/5 = 2
+--> search for factor and multiplicand 
+--> update the count with the product of the occurances of factor and multiplicand
+--> finally update in the main map.
+--> find the sum of counts that we stored in the map
+--> return sum % 1000000007
+
